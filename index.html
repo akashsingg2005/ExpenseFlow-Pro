@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="expenses.png" type="image/x-icon">
+    
+    <!-- PRIMARY SEO -->
+    <title>ExpenseFlow Pro | Smart Real-Time Expense Tracker by Babusaheb</title>
+    <meta name="description" content="ExpenseFlow Pro is a powerful, real-time expense tracker. Manage budgets, set monthly limits, and visualize spending with advanced analytics. Built for efficiency.">
+    <meta name="keywords" content="ExpenseFlow, expense tracker, budget manager, financial analytics, personal finance, Babusaheb, real-time tracking">
+    <meta name="author" content="Babusaheb">
+    <meta name="robots" content="index, follow">
+
+    <!-- OPEN GRAPH / SOCIAL MEDIA -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ExpenseFlow Pro | Smart Financial Tracking">
+    <meta property="og:description" content="Master your money with real-time tracking and intelligent insights.">
+    <meta property="og:image" content="https://fonts.gstatic.com/s/i/short-term/release/googleglyphs/payments/v4/48px.svg">
+
+    <!-- PERFORMANCE OPTIMIZATION -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+
+    <!-- EXTERNAL ASSETS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        neonBlue: '#00f2ff',
+                        neonPurple: '#7000ff',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="p-4 md:p-6 min-h-screen relative">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4" role="banner">
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl font-bold flex items-center justify-center md:justify-start">
+                    <i data-lucide="zap" class="text-cyan-400 dark:text-cyan-400 light:text-rose-500 fill-current mr-2" aria-hidden="true"></i>
+                    <span>Expense<span class="text-cyan-400 dark:text-cyan-400 light:text-rose-500">Flow</span></span>
+                    <span class="ml-2">Pro</span>
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Precision tracking for modern finance</p>
+            </div>
+            
+            <nav class="flex flex-wrap justify-center items-center gap-3" aria-label="Top Controls">
+                <div class="glass-card px-4 py-2 text-center min-w-[120px]">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Current Balance</p>
+                    <p id="total-balance" class="text-lg font-bold">₹0.00</p>
+                </div>
+                <button id="export-btn" class="glass-card px-4 py-2 text-sm font-bold flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-white/5 transition-colors" title="Export as SVG" aria-label="Export data as SVG">
+                    <i data-lucide="image" class="w-4 h-4" aria-hidden="true"></i> Export SVG
+                </button>
+                <button id="theme-toggle" class="glass-card p-2.5 hover:bg-rose-50 dark:hover:bg-white/5 transition-colors" title="Toggle Theme" aria-label="Switch between dark and light mode">
+                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-cyan-400 dark:text-cyan-400 light:text-rose-500" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </header>
+
+        <!-- Fixed Pop-up refactored to Inline Alert space -->
+        <div id="budget-alert" class="hidden mb-8 p-5 glass-card budget-warning animate-fade-in w-full">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-500">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm">Budget Exceeded!</h3>
+                        <p class="text-rose-500 text-xs">You have spent more than your set monthly limit. Consider reviewing your upcoming expenses.</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p id="alert-over-amount" class="text-rose-500 font-black text-xl">₹0.00</p>
+                    <p class="text-[10px] text-rose-500/50 uppercase font-bold">Over Limit</p>
+                </div>
+            </div>
+        </div>
+
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-4 space-y-8">
+                <!-- Transaction Form -->
+                <section class="glass-card p-6" aria-labelledby="form-title">
+                    <h2 id="form-title" class="text-md font-semibold mb-5 flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-cyan-400 dark:text-cyan-400 light:text-rose-500"></i>
+                        Add Transaction
+                    </h2>
+                    <form id="transaction-form" class="space-y-4">
+                        <input type="hidden" id="edit-id">
+                        <div>
+                            <input type="text" id="desc" name="desc" required placeholder="Description (e.g. Grocery)" 
+                                class="w-full bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-rose-500/20 dark:focus:ring-cyan-500/20 outline-none">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="amount" name="amount" required step="0.01" placeholder="Amount (₹)"
+                                class="w-full bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-rose-500/20 dark:focus:ring-cyan-500/20 outline-none">
+                            <select id="type" name="type" class="w-full bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm transition-all cursor-pointer focus:ring-2 focus:ring-rose-500/20 dark:focus:ring-cyan-500/20 outline-none">
+                                <option value="expense">Expense</option>
+                                <option value="income">Income</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select id="category" name="category" class="w-full bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm transition-all cursor-pointer focus:ring-2 focus:ring-rose-500/20 dark:focus:ring-cyan-500/20 outline-none">
+                                <option value="Food">🍔 Food & Dining</option>
+                                <option value="Rent">🏠 Rent & Bills</option>
+                                <option value="Transport">🚗 Transport</option>
+                                <option value="Shopping">🛍️ Shopping</option>
+                                <option value="Salary">💰 Salary/Bonus</option>
+                                <option value="Other">✨ Other</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="submit-btn" class="w-full btn-gradient py-3 rounded-lg font-bold text-white text-sm shadow-lg">
+                            Add Transaction
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Budget Setting -->
+                <section class="glass-card p-6" aria-labelledby="budget-title">
+                    <h2 id="budget-title" class="text-sm font-semibold mb-4 flex items-center gap-2">
+                        <i data-lucide="target" class="w-4 h-4 text-purple-400 dark:text-purple-400 light:text-violet-500"></i>
+                        Monthly Limit
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="flex flex-wrap gap-2">
+                            <input type="number" id="monthly-budget-input" placeholder="Budget ₹"
+                                class="flex-grow bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-xs outline-none min-w-[100px]">
+                            <button id="save-budget-btn" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-xs font-bold text-white transition-colors">
+                                Save
+                            </button>
+                            <button id="reset-budget-btn" class="bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 px-4 py-2 rounded-lg text-xs font-bold transition-colors">
+                                Reset
+                            </button>
+                        </div>
+                        <div id="budget-progress-container" class="space-y-1.5 pt-1">
+                            <div class="flex justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                                <span id="budget-status">Spent: ₹0</span>
+                                <span id="budget-percentage">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 dark:bg-white/5 h-2 rounded-full overflow-hidden">
+                                <div id="budget-progress-bar" class="bg-cyan-400 dark:bg-cyan-400 light:bg-rose-500 h-full transition-all duration-700" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Stats Summary -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-card p-5 border-l-4 border-emerald-500">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Income</p>
+                        <p id="total-income" class="text-lg font-bold text-emerald-600 dark:text-emerald-500">₹0.00</p>
+                    </div>
+                    <div class="glass-card p-5 border-l-4 border-rose-500">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Expense</p>
+                        <p id="total-expenses" class="text-lg font-bold text-rose-600 dark:text-rose-500">₹0.00</p>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="lg:col-span-8 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                    <section class="md:col-span-8 glass-card p-6 flex flex-col justify-between overflow-hidden">
+                        <div>
+                            <h2 class="text-sm font-semibold mb-3 flex items-center gap-2">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
+                                Smart Insights
+                            </h2>
+                            <p id="insights-text" class="text-slate-600 dark:text-slate-400 text-sm italic leading-relaxed">
+                                Personalized financial tips will appear here.
+                            </p>
+                        </div>
+                        <div id="comparison-row" class="mt-5 flex items-center gap-3">
+                            <div id="comparison-badge" class="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider hidden"></div>
+                            <span id="comparison-text" class="text-[11px] text-slate-500 font-medium"></span>
+                        </div>
+                    </section>
+                    
+                    <section class="md:col-span-4 glass-card p-6 text-center flex flex-col justify-center">
+                        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">This Month</h2>
+                        <div class="py-2">
+                            <p id="monthly-spent-val" class="text-3xl font-black">₹0.00</p>
+                        </div>
+                        <div class="mt-4 border-t border-slate-100 dark:border-white/5 pt-4">
+                            <p id="savings-ratio" class="text-base font-bold text-cyan-600 dark:text-cyan-500">0% Saving</p>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <section class="glass-card p-6 min-h-[380px] flex flex-col overflow-hidden">
+                        <h2 class="text-sm font-semibold mb-5 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-4 h-4 text-purple-400"></i>
+                            Analysis
+                        </h2>
+                        <div class="flex-grow relative w-full h-full min-h-0">
+                            <canvas id="expenseChart" aria-label="Doughnut chart showing expense distribution"></canvas>
+                        </div>
+                    </section>
+
+                    <section class="glass-card p-5 flex flex-col space-y-5">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-sm font-semibold flex items-center gap-2">
+                                <i data-lucide="history" class="w-4 h-4 text-cyan-400"></i>
+                                History
+                            </h2>
+                            <div class="flex gap-2">
+                                <input type="text" id="search-bar" placeholder="Search..." aria-label="Search transactions"
+                                    class="bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/5 rounded-lg px-3 py-2 text-xs w-24 md:w-32 focus:w-40 transition-all outline-none">
+                            </div>
+                        </div>
+                        <div id="transaction-list" class="space-y-3 max-h-[250px] overflow-y-auto custom-scrollbar pr-1"></div>
+                        <div class="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-white/5">
+                            <p id="item-count" class="text-[10px] text-slate-500 font-bold uppercase">0 records</p>
+                            <button id="clear-data" class="text-[10px] uppercase font-black text-rose-500 hover:text-rose-400 tracking-widest transition-colors">
+                                Reset All Data
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="fixed bottom-6 right-6 glass-card px-8 py-4 border-l-4 border-rose-500 dark:border-cyan-400 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50">
+        <p id="toast-msg" class="text-sm font-semibold"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
