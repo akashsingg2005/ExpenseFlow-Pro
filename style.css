@@ -1,1 +1,116 @@
-fdgfhgjm
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-body: #0a0a0c;
+            --card-bg: #141417;
+            --text-main: #e2e2e2;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --accent-glow: rgba(0, 242, 255, 0.15);
+            --shadow-deep: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .light {
+            --bg-body: #fff5f7; 
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --border-color: rgba(244, 63, 94, 0.1);
+            --accent-glow: rgba(244, 63, 94, 0.15);
+            --shadow-deep: 0 20px 40px -15px rgba(244, 63, 94, 0.25);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            border-radius: 1.25rem;
+            box-shadow: var(--shadow-deep), 0 0 15px var(--accent-glow);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background-color 0.4s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.9), 0 0 25px var(--accent-glow);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #00f2ff, #7000ff);
+            transition: all 0.2s ease;
+        }
+
+        .light .btn-gradient {
+            background: linear-gradient(135deg, #f43f5e, #8b5cf6); 
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2d2d35; border-radius: 10px; }
+        .light .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+        /* Custom Dropdown Styling */
+        .desc-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            margin-top: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-deep);
+            display: none;
+        }
+
+        .desc-dropdown.show { display: block; }
+
+        .desc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .desc-item:hover { background: rgba(0, 242, 255, 0.1); }
+        .light .desc-item:hover { background: rgba(244, 63, 94, 0.05); }
+
+        #expenseChart { max-height: 300px; }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-overlay.show .modal-card { transform: scale(1); }
