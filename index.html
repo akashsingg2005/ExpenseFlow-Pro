@@ -63,48 +63,30 @@
                     <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Current Balance</p>
                     <p id="total-balance" class="text-lg font-bold">₹0.00</p>
                 </div>
-                <button id="export-btn" class="glass-card px-4 py-2 text-sm font-bold flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-white/5 transition-colors" title="Export as SVG" aria-label="Export data as SVG">
-                    <i data-lucide="image" class="w-4 h-4" aria-hidden="true"></i> Export SVG
+                <button id="export-btn" class="glass-card px-4 py-2 text-sm font-bold flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-white/5 transition-colors" title="Export as SVG">
+                    <i data-lucide="image" class="w-4 h-4"></i> Export SVG
                 </button>
-                <button id="theme-toggle" class="glass-card p-2.5 hover:bg-rose-50 dark:hover:bg-white/5 transition-colors" title="Toggle Theme" aria-label="Switch between dark and light mode">
-                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-cyan-400 dark:text-cyan-400 light:text-rose-500" aria-hidden="true"></i>
+                <button id="theme-toggle" class="glass-card p-2.5 hover:bg-rose-50 dark:hover:bg-white/5 transition-colors" title="Toggle Theme">
+                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-cyan-400 dark:text-cyan-400 light:text-rose-500"></i>
                 </button>
             </nav>
         </header>
-
-        <!-- Fixed Pop-up refactored to Inline Alert space -->
-        <div id="budget-alert" class="hidden mb-8 p-5 glass-card budget-warning animate-fade-in w-full">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-500">
-                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-sm">Budget Exceeded!</h3>
-                        <p class="text-rose-500 text-xs">You have spent more than your set monthly limit. Consider reviewing your upcoming expenses.</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p id="alert-over-amount" class="text-rose-500 font-black text-xl">₹0.00</p>
-                    <p class="text-[10px] text-rose-500/50 uppercase font-bold">Over Limit</p>
-                </div>
-            </div>
-        </div>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Sidebar -->
             <aside class="lg:col-span-4 space-y-8">
                 <!-- Transaction Form -->
-                <section class="glass-card p-6" aria-labelledby="form-title">
-                    <h2 id="form-title" class="text-md font-semibold mb-5 flex items-center gap-2">
+                <section class="glass-card p-6">
+                    <h2 class="text-md font-semibold mb-5 flex items-center gap-2">
                         <i data-lucide="plus-circle" class="w-4 h-4 text-cyan-400 dark:text-cyan-400 light:text-rose-500"></i>
                         Add Transaction
                     </h2>
-                    <form id="transaction-form" class="space-y-4">
+                    <form id="transaction-form" class="space-y-4 relative">
                         <input type="hidden" id="edit-id">
-                        <div>
-                            <input type="text" id="desc" name="desc" required placeholder="Description (e.g. Grocery)" 
+                        <div class="relative">
+                            <input type="text" id="desc" name="desc" required autocomplete="off" placeholder="Description (e.g. Grocery)" 
                                 class="w-full bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-rose-500/20 dark:focus:ring-cyan-500/20 outline-none">
+                            <div id="desc-dropdown" class="desc-dropdown custom-scrollbar"></div>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <input type="number" id="amount" name="amount" required step="0.01" placeholder="Amount (₹)"
@@ -130,9 +112,9 @@
                     </form>
                 </section>
 
-                <!-- Budget Setting -->
-                <section class="glass-card p-6" aria-labelledby="budget-title">
-                    <h2 id="budget-title" class="text-sm font-semibold mb-4 flex items-center gap-2">
+                <!-- Monthly Limit Setting -->
+                <section class="glass-card p-6">
+                    <h2 class="text-sm font-semibold mb-4 flex items-center gap-2">
                         <i data-lucide="target" class="w-4 h-4 text-purple-400 dark:text-purple-400 light:text-violet-500"></i>
                         Monthly Limit
                     </h2>
@@ -147,7 +129,7 @@
                                 Reset
                             </button>
                         </div>
-                        <div id="budget-progress-container" class="space-y-1.5 pt-1">
+                        <div class="space-y-1.5 pt-1">
                             <div class="flex justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                                 <span id="budget-status">Spent: ₹0</span>
                                 <span id="budget-percentage">0%</span>
@@ -159,20 +141,40 @@
                     </div>
                 </section>
 
-                <!-- Stats Summary -->
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="glass-card p-5 border-l-4 border-emerald-500">
-                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Income</p>
+                    <div class="glass-card p-5 border-l-4 border-emerald-500 text-center">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Income</p>
                         <p id="total-income" class="text-lg font-bold text-emerald-600 dark:text-emerald-500">₹0.00</p>
                     </div>
-                    <div class="glass-card p-5 border-l-4 border-rose-500">
-                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Expense</p>
+                    <div class="glass-card p-5 border-l-4 border-rose-500 text-center">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Expense</p>
                         <p id="total-expenses" class="text-lg font-bold text-rose-600 dark:text-rose-500">₹0.00</p>
                     </div>
                 </div>
             </aside>
 
+            <!-- Main Content Area -->
             <div class="lg:col-span-8 space-y-8">
+                
+                <!-- NEW: ON-PAGE ALERT CARD -->
+                <section id="alert-card-container" class="glass-card p-5 hidden animate-fade-in border-l-4 border-rose-500">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500">
+                                <i data-lucide="alert-circle" class="w-7 h-7"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm text-rose-500">Budget Warning</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-xs">You've exceeded your monthly limit. Review your recent transactions below.</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p id="card-alert-amount" class="text-rose-500 font-black text-2xl">₹0.00</p>
+                            <p class="text-[10px] text-rose-500/50 uppercase font-bold tracking-widest">Over Limit</p>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                     <section class="md:col-span-8 glass-card p-6 flex flex-col justify-between overflow-hidden">
                         <div>
@@ -181,10 +183,10 @@
                                 Smart Insights
                             </h2>
                             <p id="insights-text" class="text-slate-600 dark:text-slate-400 text-sm italic leading-relaxed">
-                                Personalized financial tips will appear here.
+                                Financial tips based on your activity.
                             </p>
                         </div>
-                        <div id="comparison-row" class="mt-5 flex items-center gap-3">
+                        <div class="mt-5 flex items-center gap-3">
                             <div id="comparison-badge" class="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider hidden"></div>
                             <span id="comparison-text" class="text-[11px] text-slate-500 font-medium"></span>
                         </div>
@@ -208,7 +210,7 @@
                             Analysis
                         </h2>
                         <div class="flex-grow relative w-full h-full min-h-0">
-                            <canvas id="expenseChart" aria-label="Doughnut chart showing expense distribution"></canvas>
+                            <canvas id="expenseChart"></canvas>
                         </div>
                     </section>
 
@@ -218,14 +220,12 @@
                                 <i data-lucide="history" class="w-4 h-4 text-cyan-400"></i>
                                 History
                             </h2>
-                            <div class="flex gap-2">
-                                <input type="text" id="search-bar" placeholder="Search..." aria-label="Search transactions"
-                                    class="bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/5 rounded-lg px-3 py-2 text-xs w-24 md:w-32 focus:w-40 transition-all outline-none">
-                            </div>
+                            <input type="text" id="search-bar" placeholder="Search..." 
+                                class="bg-slate-100 dark:bg-[#1a1a1e] border border-slate-200 dark:border-white/5 rounded-lg px-3 py-2 text-xs w-24 md:w-32 focus:w-40 transition-all outline-none">
                         </div>
                         <div id="transaction-list" class="space-y-3 max-h-[250px] overflow-y-auto custom-scrollbar pr-1"></div>
                         <div class="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-white/5">
-                            <p id="item-count" class="text-[10px] text-slate-500 font-bold uppercase">0 records</p>
+                            <p id="item-count" class="text-[10px] text-slate-500 font-bold">0 records</p>
                             <button id="clear-data" class="text-[10px] uppercase font-black text-rose-500 hover:text-rose-400 tracking-widest transition-colors">
                                 Reset All Data
                             </button>
@@ -236,10 +236,26 @@
         </main>
     </div>
 
+    <!-- CUSTOM CONFIRMATION MODAL -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="glass-card modal-card p-8 max-w-sm w-full mx-4 text-center">
+            <div id="modal-icon-container" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            </div>
+            <h2 id="modal-title" class="text-xl font-bold mb-2">Are you sure?</h2>
+            <p id="modal-desc" class="text-slate-500 dark:text-slate-400 text-sm mb-6">This action cannot be undone and will delete your data.</p>
+            <div class="flex gap-3">
+                <button id="modal-cancel" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 font-bold text-sm transition-colors hover:bg-slate-200 dark:hover:bg-white/10">Cancel</button>
+                <button id="modal-confirm" class="flex-1 px-4 py-3 rounded-xl bg-rose-600 font-bold text-white text-sm shadow-lg hover:bg-rose-500 transition-colors">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="fixed bottom-6 right-6 glass-card px-8 py-4 border-l-4 border-rose-500 dark:border-cyan-400 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50">
         <p id="toast-msg" class="text-sm font-semibold"></p>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js">
+    </script>
 </body>
 </html>
